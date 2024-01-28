@@ -18,7 +18,6 @@ def change_size(n):
 
 def change():
     avgtimes = []
-# For multiple possible input lengths...
     listlengths = [1000, 2000, 5000, 10000]
     for listlength in listlengths:
         rez = []
