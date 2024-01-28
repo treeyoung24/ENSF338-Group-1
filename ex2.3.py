@@ -1,7 +1,7 @@
 import json
 
-with open('large-file.json', 'r', encoding='utf-8') as f:
-    data = json.load(f)
+f = open('large-file.json', 'r', encoding='utf-8')
+data = json.load(f)
 
 def change_size(data):
     for record in data:
