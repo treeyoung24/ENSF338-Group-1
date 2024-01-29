@@ -34,6 +34,7 @@ def linear_regression(listlengths, avgtimes):
     linevalues = [slope * x + intercept for x in listlengths]
     plt.plot(listlengths, linevalues, 'r')
     print("The linear model is: t = %.2e * n + %.2e" % (slope, intercept))
+    plt.savefig('output.3.2.png')
     return 0
 
 def main():
