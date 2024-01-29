@@ -1,7 +1,7 @@
 import timeit
 
 def code_measured(file):
-    with open("C:/University/VSCode/ENSF338/Lab01/pg2701.txt", "r", encoding="utf-8") as textfile:
+    with open("pg2701.txt", "r", encoding="utf-8") as textfile:
         textfile.seek(915) # starts from chapter 1
         vowel_list = ['a', 'e', 'i', 'o', 'u', 'y', 'A', 'E', 'I', 'O', 'U', 'Y'] 
         vowel_amt = 0
@@ -23,9 +23,9 @@ def code_measured(file):
 
     avg_vowels = (vowel_amt / word_amt)
 
-file = "C:/University/VSCode/ENSF338/Lab01/pg2701.txt"
+file = "pg2701.txt"
 
-time_taken = timeit.timeit(lambda: code_measured("C:/University/VSCode/ENSF338/Lab01/pg2701.txt"), number=100)
+time_taken = timeit.timeit(lambda: code_measured("pg2701.txt"), number=100)
 
 avg_time = time_taken / 100
 
