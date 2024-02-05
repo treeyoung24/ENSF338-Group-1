@@ -74,8 +74,8 @@ if __name__ == "__main__":
 
 
 """
-The linear search function has a time complexity of O(n), while the binary search function has a time complexity of O(log n).
-The linear search function parameters are approximately [1e-07, 1e-05], while the binary search function parameters are approximately [1e-07, 1e-05].
-While the linear search function has a linear plot, the binary search function has a logarithmic plot.
-The results are as expected since linear search has a linear time complexity O(n), while binary search has a logarithmic time complexity O(log n).
+The linear search function has a time complexity of O(n), while the binary search function has a time complexity of O(log n)
+The linear search function parameters are approximately [30000, 0.00045], while the binary search function parameters are [30000, 2.0]
+While the linear search function has a linear plot, the binary search function has a logarithmic plot
+The results are as expected since linear search has a linear time complexity O(n), while binary search has a logarithmic time complexity O(log n)
 """
