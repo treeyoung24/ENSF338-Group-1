@@ -66,19 +66,22 @@ for n in n_values:
     memoized_times.append(end_time - start_time)
 
 # Plotting the results
+import matplotlib.pyplot as plt
+
+# Plotting memoized Fibonacci function execution time
+plt.figure()  # Create a new figure
 plt.plot(n_values, memoized_times, label='Memoized')
 plt.xlabel('Input (n)')
 plt.ylabel('Time (s)')
 plt.title('Memoized Fibonacci Function Execution Time')
 plt.legend()
 plt.savefig('ex1.6.2.jpg')
-plt.show()
 
+# Plotting original Fibonacci function execution time
+plt.figure()  # Create another new figure
 plt.plot(n_values, original_times, label='Original')
 plt.xlabel('Input (n)')
 plt.ylabel('Time (s)')
 plt.title('Original Fibonacci Function Execution Time')
 plt.legend()
 plt.savefig('ex1.6.1.jpg')
-plt.show()
-
