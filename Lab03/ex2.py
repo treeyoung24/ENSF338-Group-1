@@ -1,19 +1,3 @@
-# 1. Implement and test both algorithms on input of 20 different sizes. The
-# choice of sizes is yours, but it must be such that it evidences for which
-# sizes each algorithm is faster [0.2 pts]
-
-# 2. Each test must be repeated on best, worst, and average case scenario for
-# both algorithm [0.4 pts]
-#   1. Note that “best/worst/average” may mean different things for the two different
-#   algorithms
-
-# 3. Generate performance plots for all the six (three?) cases. Performance of
-# both algorithms must be visualized in each plot. In the plots, highlight for
-# which inputs one algorithm perform better than the other [0.4 pts]
-
-# 4. Choose a threshold (on the input size) that determines whether the input
-# is “small” or not. Justify your choice based on the plots. [0.2 pts]
-
 import time
 import matplotlib.pyplot as plt
 import random
@@ -47,7 +31,7 @@ def quick_sort(arr, low, high):
         quick_sort(arr, pi+1, high)
 
 sizes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 350, 400, 500, 600, 750, 850, 975]
-# sizes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600]
+
 bubblebest = []
 bubbleworst = []
 bubbleavg = []
