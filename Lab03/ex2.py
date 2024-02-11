@@ -119,10 +119,3 @@ plt.ylabel('Time (seconds)')
 plt.legend()
 plt.show()
 plt.close()
-
-# 4. Choose a threshold (on the input size) that determines whether the input
-# is “small” or not. Justify your choice based on the plots. [0.2 pts]
-
-# The threshold determined from the plots is around 100 inputs. This number is chosen because in serveral plots that 
-# are created, the bubble sort is sometimes faster than quick sort for inputs less than 100. After a list passes 100 elements, quick 
-# sort is faster than bubble sort. This is the threshold that determines whether the input is "small" or not.
