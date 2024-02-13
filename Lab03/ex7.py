@@ -1,59 +1,40 @@
 import time
-import random
 import matplotlib.pyplot as plt
 
-def binary_search(arr, target, start, end):
-    while start <= end:
-        mid = (start + end) // 2
+def binary_search(arr, target, initial_midpoint=None):
+    low, high = 0, len(arr) - 1
+    if initial_midpoint is not None:
+        mid = initial_midpoint
+    else:
+        mid = (low + high) // 2
+    while low <= high:
         if arr[mid] == target:
             return mid
         elif arr[mid] < target:
-            start = mid + 1
+            low = mid + 1
         else:
-            end = mid - 1
+            high = mid - 1
+        mid = (low + high) // 2
     return -1
 
-def timed_binary_search(arr, target, start_mid):
-    start_time = time.time()
-    result = binary_search(arr, target, start_mid, len(arr) - 1)
-    end_time = time.time()
-    return result, end_time - start_time
+def time_search_tasks(arr, target, initial_midpoints):
+    times = []
+    for initial_midpoint in initial_midpoints:
+        start_time = time.time()
+        binary_search(arr, target, initial_midpoint)
+        end_time = time.time()
+        times.append(end_time - start_time)
+    return times
 
-def time_search_tasks(arr, targets, initial_midpoints):
-    results = []
-    for target in targets:
-        task_results = []
-        for mid in initial_midpoints:
-            result, time_taken = timed_binary_search(arr, target, mid)
-            task_results.append((mid, result, time_taken))
-        results.append(task_results)
-    return results
-
-def get_best_midpoints(results):
-    best_midpoints = []
-    for task_results in results:
-        best_midpoint = min(task_results, key=lambda x: x[2])
-        best_midpoints.append(best_midpoint)
-    return best_midpoints
-
-def plot_scatterplot(results, best_midpoints):
-    plt.figure(figsize=(10, 6))
-    for i, task_results in enumerate(results):
-        midpoints, times = zip(*[(mid, time) for mid, _, time in task_results])
-        plt.scatter(midpoints, times, label=f'Task {i+1}')
-    best_midpoints, best_times = zip(*[(mid, time) for mid, _, time in best_midpoints])
-    plt.scatter(best_midpoints, best_times, color='red', marker='x', label='Best Midpoints')
+def plot_search_tasks(arr, target, initial_midpoints, times):
+    plt.scatter(initial_midpoints, times)
     plt.xlabel('Initial Midpoint')
-    plt.ylabel('Time Taken (seconds)')
-    plt.title('Performance of Binary Search with Different Initial Midpoints')
-    plt.legend()
+    plt.ylabel('Time (s)')
+    plt.title('Binary Search with Configurable Initial Midpoint')
     plt.show()
 
-# Example usage:
-arr = sorted(random.sample(range(1, 100), 50))
-targets = [random.randint(1, 100) for _ in range(5)]
-initial_midpoints = [10, 20, 30, 40, 45]
-
-results = time_search_tasks(arr, targets, initial_midpoints)
-best_midpoints = get_best_midpoints(results)
-plot_scatterplot(results, best_midpoints)
+arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+target = 6
+initial_midpoints = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+times = time_search_tasks(arr, target, initial_midpoints)
+plot_search_tasks(arr, target, initial_midpoints, times)
