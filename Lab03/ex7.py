@@ -38,3 +38,11 @@ target = 6
 initial_midpoints = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 times = time_search_tasks(arr, target, initial_midpoints)
 plot_search_tasks(arr, target, initial_midpoints, times)
+
+'''
+The choice of initial midpoint appears to affect performance. When the initial midpoint is closer to the target, the search
+algorithm can find the target more quickly. This is because the search space is reduced more effectively in the early iterations. 
+However, if the initial midpoint is too far from the target, the search algorithm may have to perform more iterations to find the target. 
+This is because the search space is reduced less effectively in the early iterations. Therefore, the choice of initial midpoint can have a significant impact on the performance of the binary search algorithm.
+
+'''
