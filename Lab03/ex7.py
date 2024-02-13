@@ -48,3 +48,12 @@ def plot_scatterplot(results, best_midpoints):
     plt.title('Performance of Binary Search with Different Initial Midpoints')
     plt.legend()
     plt.show()
+
+# Example usage:
+arr = sorted(random.sample(range(1, 100), 50))
+targets = [random.randint(1, 100) for _ in range(5)]
+initial_midpoints = [10, 20, 30, 40, 45]
+
+results = time_search_tasks(arr, targets, initial_midpoints)
+best_midpoints = get_best_midpoints(results)
+plot_scatterplot(results, best_midpoints)
