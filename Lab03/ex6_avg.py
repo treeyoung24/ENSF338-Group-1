@@ -77,3 +77,6 @@ for size in sizes:
     linear_search_times.append(sum(measure_performance(size)[0]))
     binary_search_times.append(sum(measure_performance(size)[1]))
 plot_performance(sizes, linear_search_times, binary_search_times)
+
+# The plot shows that the binary search algorithm is faster than the linear search algorithm for all array sizes.
+# The binary search algorithm is O(log n) while the linear search algorithm is O(n).
