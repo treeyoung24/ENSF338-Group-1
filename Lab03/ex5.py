@@ -66,8 +66,8 @@ def main():
 if __name__ == '__main__':
     main()
 
-# Traditional insertion sort is faster than binary insertion sort. This is because binary insertion
-# sort goes through the whole array to find the correct position for the element to be inserted, which
-# is O(n). However, the traditional insertion sort only goes through the array until it finds the correct
-# position, which is O(n) in the worst case. Therefore, binary insertion sort is slower than traditional 
-# insertion sort for larger arrays.
+# Traditional insertion sort becomes exponentially faster than binary insertion sort for larger arrays. 
+# This is because binary insertion sort goes through the whole array to find the correct position for the 
+# element to be inserted, which is O(n). However, the traditional insertion sort only goes through the array 
+# elements that are to the left of the current element being inserted, which is O(n) in the worst case. 
+# Therefore, binary insertion sort is slower than traditional insertion sort for larger arrays.
