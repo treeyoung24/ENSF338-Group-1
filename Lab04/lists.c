@@ -59,7 +59,7 @@ list_resize(PyListObject *self, Py_ssize_t newsize)
 
     /* This over-allocates proportional to the list size, making room
      * for additional growth.  The over-allocation is mild, but is
-     * enough to give linear-time amortized behavior over a long
+     * enough to give linear-time  behavior over a long
      * sequence of appends() in the presence of a poorly-performing
      * system realloc().
      * Add padding to make the allocated size multiple of 4.
