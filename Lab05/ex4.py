@@ -111,16 +111,11 @@ def plot_distribution(array_queue_times, linked_list_queue_times):
 
 
 
-array_queue_times = [task_perform(Queue(), random_tasks()) for _ in range(100)]
-linked_list_queue_times = [task_perform(LinkedListQueue(), random_tasks()) for _ in range(100)]
+arrayQueue = [task_perform(Queue(), random_tasks()) for _ in range(100)]
+linkedList = [task_perform(LinkedListQueue(), random_tasks()) for _ in range(100)]
+plot_distribution(arrayQueue, linkedList)
 
-array_queue_avg_time = sum(array_queue_times) / len(array_queue_times)
-linked_list_queue_avg_time = sum(linked_list_queue_times) / len(linked_list_queue_times)
 
-print("ArrayQueue average performance:", array_queue_avg_time)
-print("LinkedListQueue average performance:", linked_list_queue_avg_time)
-
-plot_distribution(array_queue_times, linked_list_queue_times)
 """
 From the result, it can be seen that implementation of Queue using linked list is faster than using array.
 Since the time complexity of enqueue and dequeue operations in linked list is O(1) while in array is O(n).
