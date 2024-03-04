@@ -80,6 +80,7 @@ if __name__ == "__main__":
     plt.title('Distribution of Stack Performance')
     plt.legend(loc='upper right')
     plt.show()
-# The graph shows that the array stack is faster than the linked list stack. 
-# This is because the array stack has O(1) time complexity for push and pop operations,
-# while the linked list stack has O(n) time complexity for pop operation.
+# The graph shows that the array stack is faster than the linked list stack.
+# Theoretically, push and pop are constant time operations for both implementations.
+# However, the array stack could be faster in practice due to having a fixed-size array
+# and not having to allocate memory for each new node as a linked-list would.
