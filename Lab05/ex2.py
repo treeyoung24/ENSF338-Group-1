@@ -107,3 +107,8 @@ if __name__ == "__main__":
 
     print("\nUsing PriorityQueueSortedInsertion:")
     measure_performance(PriorityQueueSortedInsertion)
+
+# 2.5 
+    # based on the values of the average time taken, PriorityQueueSortedInsertion is faster than PriorityQueueMergeSort.
+    # PriorityQueueSortedInsertion is faster than PriorityQueueMergeSort because the enqueue operation in PriorityQueueSortedInsertion has time complexity o 
+    # O(n), while the enqueue operation in PriorityQueueMergeSort has time complexity of O(nlogn). 
