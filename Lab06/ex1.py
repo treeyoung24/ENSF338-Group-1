@@ -62,6 +62,7 @@ def performance_measurement(bst, elements):
 
 #Generate a 10000-element sorted vector and use it to build a tree by inserting each element
 elements = list(range(10000))
+
 bst = BinarySearchTree()
 for element in elements:
     bst.root = bst.insert(bst.root, element)
@@ -74,5 +75,7 @@ print(f"Average time: {average_time}, Total time: {total_time}")
 random.shuffle(elements)
 
 # Measure search performance
-average_time, total_time = measure_search_performance(bst, elements)
+average_time, total_time = performance_measurement(bst, elements)
 print(f"Average time after shuffle: {average_time}, Total time after shuffle: {total_time}")
+
+# 4. Discuss the results:
