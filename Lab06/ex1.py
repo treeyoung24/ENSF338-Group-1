@@ -1,12 +1,9 @@
 import timeit
 import random
+import sys
 
-# class Node:
-#     def __init__(self, data, parent=None, left=None, right=None):
-#         self.parent = parent
-#         self.data = data
-#         self.left = left
-#         self.right = right
+# avoid RecursionError limit of standard 1000
+sys.setrecursionlimit(10000)
 
 class Node:
     def __init__(self, key):
@@ -18,26 +15,28 @@ class BinarySearchTree:
     def __init__(self):
         self.root = None
 
-    def insert(self, root, key):
-        if root is None:
-            return Node(key)
-        else:
-            if root.val < key:
-                root.right = self.insert(root.right, key)
-            else:
-                root.left = self.insert(root.left, key)
-        return root
+    def insert(self, key):
+        new_node = Node(key)
+        if self.root is None:
+            self.root = new_node
+            return
 
-    # def search(self, root):
-    #     current = root
-    #     while current is not None:
-    #         if self == current.self:
-    #             return current
-    #         elif self <= current.self:
-    #             current = current.left
-    #         else:
-    #             current = current.right
-    #     return None  
+        current = self.root
+        while True:
+            if key < current.val:
+                if current.left is None:
+                    current.left = new_node
+                    return
+                else:
+                    current = current.left
+            else:
+                if current.right is None:
+                    current.right = new_node
+                    return
+                else:
+                    current = current.right
+
+ 
     def search(self, root, key):
         current = root
         while current is not None:
@@ -47,7 +46,7 @@ class BinarySearchTree:
                 current = current.left
             else:
                 current = current.right
-#timing mesaurements, but unfinished.
+#timing mesaurements
 def performance_measurement(bst, elements):
     total_time = 0
     for element in elements:
@@ -65,17 +64,19 @@ elements = list(range(10000))
 
 bst = BinarySearchTree()
 for element in elements:
-    bst.root = bst.insert(bst.root, element)
+    bst.root = bst.insert(element)
 
-# Measure search performance
+# Measure search performance of sorted 
 average_time, total_time = performance_measurement(bst, elements)
 print(f"Average time: {average_time}, Total time: {total_time}")
 
-# Shuffle the vector used for question 2 (using random.shuffle)
+# Shuffle the vector
 random.shuffle(elements)
 
-# Measure search performance
+# Measure search performance of shuffled
 average_time, total_time = performance_measurement(bst, elements)
 print(f"Average time after shuffle: {average_time}, Total time after shuffle: {total_time}")
 
 # 4. Discuss the results:
+# The faster approach would be the shuffled array. This is because the tree is less efficient with the elements being in a linked list, which happens 
+# with the array being sorted. The shuffled array has a well balanced tree, which is more efficient.
