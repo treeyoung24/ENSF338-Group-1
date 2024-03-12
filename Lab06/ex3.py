@@ -1,59 +1,67 @@
 import sys
+class Node:
+    def __init__(self, data, left=None, right=None):
+        self.data = data
+        self.left = left
+        self.right = right
 
-class TreeNode:
-    def __init__(self, value):
-        self.value = value
-        self.left = None
-        self.right = None
+    def evaluate(self):
+        if isinstance(self.data, int):
+            return self.data
+        left_val = self.left.evaluate() if self.left else None
+        right_val = self.right.evaluate() if self.right else None
+        return self.apply_operation(left_val, right_val)
 
-def construct_tree(tokens):
-    def helper(token_list):
-        stack = []
-        while token_list:
-            token = token_list.pop()
-            if token == ')':  # Start of a subexpression (in reverse order)
-                stack.append(helper(token_list))
-            elif token in '+-*/':
-                right = stack.pop()
-                left = stack.pop()
-                node = TreeNode(token)
-                node.left = left
-                node.right = right
-                stack.append(node)
-            elif token == '(':  # End of a subexpression
-                return stack.pop()  # Return the subexpression tree
-            else:  # Token is a number
-                stack.append(TreeNode(float(token)))
-        return stack.pop()
+    def apply_operation(self, left, right):
+        if self.data == '+': return left + right
+        elif self.data == '-': return left - right
+        elif self.data == '*': return left * right
+        elif self.data == '/': return left / right
+        return 0
 
-    # Reverse the tokens for right-to-left evaluation (to mimic stack behavior correctly)
-    tokens = tokens[::-1]
-    return helper(tokens)
+def build_expression_tree(tokens):
+    def parse_expression(tokens):
+        if not tokens:
+            return None
+        if tokens[0] == '(' and tokens[-1] == ')':
+            tokens = tokens[1:-1]
+        
+        lowest_precedence = float('inf')
+        operator_position = -1
+        parentheses_count = 0
 
-def evaluate_tree(node):
-    if node.value == '+':
-        return evaluate_tree(node.left) + evaluate_tree(node.right)
-    elif node.value == '-':
-        return evaluate_tree(node.left) - evaluate_tree(node.right)
-    elif node.value == '*':
-        return evaluate_tree(node.left) * evaluate_tree(node.right)
-    elif node.value == '/':
-        return evaluate_tree(node.left) / evaluate_tree(node.right)
-    else:  # Node is a number
-        return node.value
+        for i in range(len(tokens) - 1, -1, -1):
+            token = tokens[i]
 
-def parse_expression(expression):
+            if token == ')':
+                parentheses_count += 1
+            elif token == '(':
+                parentheses_count -= 1
+            elif parentheses_count == 0 and token in {'+', '-', '*', '/'}:
+                precedence = {'+': 1, '-': 1, '*': 2, '/': 2}[token]
+                if precedence <= lowest_precedence:
+                    lowest_precedence = precedence
+                    operator_position = i
+
+        if operator_position != -1:
+            root = Node(tokens[operator_position])
+            root.left = parse_expression(tokens[:operator_position])
+            root.right = parse_expression(tokens[operator_position + 1:])
+            return root
+        else:
+            if tokens[0].isdigit():
+                return Node(int(tokens[0]))
+            else:
+                return parse_expression(tokens[1:-1])  # Handle single number inside parentheses
+
+    return parse_expression(tokens)
+
+def main(expression):
     tokens = expression.split()
-    return construct_tree(tokens)
+    root = build_expression_tree(tokens)
+    result = root.evaluate()
+    print(int(result))
 
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: python script.py '(expression)'")
-        return
+if __name__ == "__main__":
     expression = sys.argv[1]
-    tree = parse_expression(expression)
-    result = evaluate_tree(tree)
-    print(result)
-
-if __name__ == '__main__':
-    main()
+    main(expression)
