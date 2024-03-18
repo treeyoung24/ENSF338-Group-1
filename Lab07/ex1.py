@@ -12,72 +12,77 @@ class Node:
         self.right = right
         self.height = 1
 
-def insert(data, root=None):
-    current = root
-    parent = None
-    while current is not None:
-        parent = current
-        if data <= current.data:
-            current = current.left
+# 1.
+class BinarySearchTree:
+    def insert(self, data, root=None):
+        current = root
+        parent = None
+        while current is not None:
+            parent = current
+            if data <= current.data:
+                current = current.left
+            else:
+                current = current.right
+        if root is None:
+            root = Node(data)
+        elif data <= parent.data:
+            parent.left = Node(data, parent)
         else:
-            current = current.right
-    if root is None:
-        root = Node(data)
-    elif data <= parent.data:
-        parent.left = Node(data, parent)
-    else:
-        parent.right = Node(data, parent)
-    if parent is not None:
-        parent.height = 1 + max(_get_height(parent.left), _get_height(parent.right))
-    return root
+            parent.right = Node(data, parent)
+        if parent is not None:
+            parent.height = 1 + max(self._get_height(parent.left), self._get_height(parent.right))
+        return root
 
-def search(data, root):
-    current = root
-    while current is not None:
-        if data == current.data:
-            return current
-        elif data < current.data:
-            current = current.left
-        else:
-            current = current.right
-    return None
+    def search(self, data, root):
+        current = root
+        while current is not None:
+            if data == current.data:
+                return current
+            elif data < current.data:
+                current = current.left
+            else:
+                current = current.right
+        return None
 
-def _get_height(node):
-    if not node:
-        return 0
-    return node.height
+# 2.
+    def _get_height(self, node):
+        if not node:
+            return 0
+        return node.height
 
-def _get_balance(node):
-    if not node:
-        return 0
-    return abs(_get_height(node.left) - _get_height(node.right))
+    def _get_balance(self, node):
+        if not node:
+            return 0
+        return abs(self._get_height(node.left) - self._get_height(node.right))
 
-def _preorder_traversal(node):
-    if node:
-        yield node
-        yield from _preorder_traversal(node.left)
-        yield from _preorder_traversal(node.right)
+    def _preorder_traversal(self, node):
+        if node:
+            yield node
+            yield from self._preorder_traversal(node.left)
+            yield from self._preorder_traversal(node.right)
 
-# Generate tasks
+# 3.
 tasks = [list(range(1, 1001)) for _ in range(1000)]
 for task in tasks:
     random.shuffle(task)
 
-# Measure performance and balance
+# 4.
+bst = BinarySearchTree()
+
 performances = []
 balances = []
 for task in tasks:
     root = None
     for item in task:
-        root = insert(item, root)
+        root = bst.insert(item, root)
     start_time = time.time()
     for item in task:
-        search(item, root)
+        bst.search(item, root)
     end_time = time.time()
     performances.append(end_time - start_time)
-    balances.append(max(_get_balance(node) for node in _preorder_traversal(root)))
+    balances.append(max(bst._get_balance(node) for node in bst._preorder_traversal(root)))
 
-# Generate scatterplot
+# 5.
 plt.scatter(balances, performances)
 plt.xlabel('Absolute Balance')
 plt.ylabel('Search Time')
