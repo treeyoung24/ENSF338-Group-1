@@ -1,27 +1,23 @@
-import random
-import time
-
-import matplotlib.pyplot as plt
-
-
 class Node:
-    def __init__(self, data, parent=None, left=None, right=None):
-        self.parent = parent
+    def __init__(self, data, left=None, right=None, parent=None, height=1):
         self.data = data
         self.left = left
         self.right = right
+        self.parent = parent
         self.height = 1
+        self.balance = 0  # New nodes are balanced
+        
 
-# 1.
-class BinarySearchTree:
-    
-    def _get_pivot(self, node):
+class AVLTree:
+    def _get_height(self, node):
         if node is None:
-            return None
-        balance = self._get_balance(node)
-        if abs(balance) > 1:
-            return node
-        return self._get_pivot(node.parent)
+            return 0
+        return node.height
+
+    def _get_balance(self, node):
+        if node is None:
+            return 0
+        return self._get_height(node.left) - self._get_height(node.right)
 
     def insert(self, data, root=None):
         current = root
@@ -34,65 +30,47 @@ class BinarySearchTree:
                 current = current.right
         if root is None:
             root = Node(data)
-        elif data <= parent.data:
-            parent.left = Node(data, parent)
         else:
-            parent.right = Node(data, parent)
-        if parent is not None:
-            parent.height = 1 + max(self._get_height(parent.left), self._get_height(parent.right))
-        return root
-
-    def search(self, data, root):
-        current = root
-        while current is not None:
-            if data == current.data:
-                return current
-            elif data < current.data:
-                current = current.left
+            if data <= parent.data:
+                parent.left = Node(data, parent=parent)
             else:
-                current = current.right
-        return None
+                parent.right = Node(data, parent=parent)
 
-# 2.
-    def _get_height(self, node):
-        if not node:
-            return 0
-        return node.height
+        pivot = None
+        current = parent
+        while current is not None:
+            current.height = 1 + max(self._get_height(current.left), self._get_height(current.right))
+            if abs(self._get_balance(current)) > 1:
+                pivot = current
+                break
+            current = current.parent
+        # Checking if pivot is None
+        if pivot is None:
+            print("Case #1: Pivot not detected")
+        else:
+        # Check if node was added to the shorter subtree
+            if (pivot.balance == -1 and self._get_balance(pivot.right) == 1) or \
+            (pivot.balance == 1 and self._get_balance(pivot.left) == -1):
+                print("Case #2: A pivot exists, and a node was added to the shorter subtree")
+            else:
+                print("Case #3 not supported")
 
-    def _get_balance(self, node):
-        if not node:
-            return 0
-        return abs(self._get_height(node.left) - self._get_height(node.right))
+        return root, pivot
 
-    def _preorder_traversal(self, node):
-        if node:
-            yield node
-            yield from self._preorder_traversal(node.left)
-            yield from self._preorder_traversal(node.right)
+print("Adding a node results in Case 1")
+avlt = AVLTree()
+root, pivot = avlt.insert(10)
+root, pivot = avlt.insert(5, root)
+root, pivot = avlt.insert(15, root) 
+# tree is balanced after adding 15.
 
-# 3.
-tasks = [list(range(1, 1001)) for _ in range(1000)]
-for task in tasks:
-    random.shuffle(task)
+print("Adding a node results in Case 2")
+avlt = AVLTree()
+root, pivot = avlt.insert(20)
+root, pivot = avlt.insert(10, root)
+root, pivot = avlt.insert(30, root)
+root, pivot = avlt.insert(25, root)
 
-# 4.
-bst = BinarySearchTree()
-
-performances = []
-balances = []
-for task in tasks:
-    root = None
-    for item in task:
-        root = bst.insert(item, root)
-    start_time = time.time()
-    for item in task:
-        bst.search(item, root)
-    end_time = time.time()
-    performances.append(end_time - start_time)
-    balances.append(max(bst._get_balance(node) for node in bst._preorder_traversal(root)))
-
-# 5.
-plt.scatter(balances, performances)
-plt.xlabel('Absolute Balance')
-plt.ylabel('Search Time')
-plt.show()
+print("Adding a node results in Case 3")
+avlt = AVLTree()
+root, pivot = avlt.insert(25, root)
