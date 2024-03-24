@@ -1,79 +1,64 @@
-import matplotlib.pyplot as plt
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = []
 
+    def add_edge(self, u, v, w):
+        self.graph.append((u, v, w))
 
-def bubble_sort(arr):
-    n = len(arr)
-    comparisons = 0
-    swaps = 0
-    for i in range(n):
-        for j in range(0, n-i-1):
-            comparisons += 1
-            if arr[j] > arr[j+1]:
-                temp = arr[j]
-                arr[j] = arr[j+1]
-                arr[j+1] = temp
-                swaps += 1
-    return comparisons, swaps
+    def find_parent(self, parent, i):
+        if parent[i] == i:
+            return i
+        return self.find_parent(parent, parent[i])
 
-def test(arr):
-    comparisons, swaps = bubble_sort(arr)
-    print(f'Sorted array: {arr}\n Number of comparisons: {comparisons}\n Number of swaps: {swaps}')
-    return comparisons, swaps
+    def union(self, parent, rank, x, y):
+        xroot = self.find_parent(parent, x)
+        yroot = self.find_parent(parent, y)
 
-def plot(sizes, comparison_counts, swap_counts):
-    plt.figure(figsize=(12, 6))
-    
-    plt.subplot(1, 2, 1)
-    plt.plot(sizes, comparison_counts, marker='o')
-    plt.title('Number of Comparisons')
-    plt.xlabel('Input Size')
-    plt.ylabel('Comparisons')
+        if rank[xroot] < rank[yroot]:
+            parent[xroot] = yroot
+        elif rank[xroot] > rank[yroot]:
+            parent[yroot] = xroot
+        else:
+            parent[yroot] = xroot
+            rank[xroot] += 1
 
-    plt.subplot(1, 2, 2)
-    plt.plot(sizes, swap_counts, marker='o')
-    plt.title('Number of Swaps')
-    plt.xlabel('Input Size')
-    plt.ylabel('Swaps')
+   
+    def mst(self):
+        if len(self.graph) < self.V - 1:
+            return "The graph is not connected."
 
-    plt.tight_layout()
-    plt.show()
+        result = []
+        i, e = 0, 0
 
-def main():
-    sizes = []
-    comparison_counts = []
-    swap_counts = []
+        self.graph = sorted(self.graph, key=lambda item: item[2])
 
-    arr = [30, 22, 7, 20, 14]
-    comparisons, swaps = test(arr)
-    sizes.append(len(arr))
-    comparison_counts.append(comparisons)
-    swap_counts.append(swaps)
+        parent = []
+        rank = []
 
-    arr = [38, 29, 5, 49, 18, 11, 1, 23]
-    comparisons, swaps = test(arr)
-    sizes.append(len(arr))
-    comparison_counts.append(comparisons)
-    swap_counts.append(swaps)
+        for node in range(self.V):
+            parent.append(node)
+            rank.append(0)
 
-    arr = [14, 2, 17, 40, 15, 23, 11, 36, 4, 29, 33]
-    comparisons, swaps = test(arr)
-    sizes.append(len(arr))
-    comparison_counts.append(comparisons)
-    swap_counts.append(swaps)
+        while e < self.V - 1:
+            u, v, w = self.graph[i]
+            i += 1
+            x = self.find_parent(parent, u)
+            y = self.find_parent(parent, v)
 
-    arr = [10, 17, 30, 13, 21, 20, 42, 28, 19, 7, 29, 4, 38, 47, 11, 36, 45]
-    comparisons, swaps = test(arr)
-    sizes.append(len(arr))
-    comparison_counts.append(comparisons)
-    swap_counts.append(swaps)
+            if x != y:
+                e += 1
+                result.append([u, v, w])
+                self.union(parent, rank, x, y)
 
-    arr = [45, 49, 37, 39, 21, 22, 26, 32, 47, 12, 4, 5, 20, 11, 7, 48, 41, 30, 15, 1]
-    comparisons, swaps = test(arr)
-    sizes.append(len(arr))
-    comparison_counts.append(comparisons)
-    swap_counts.append(swaps)
+        return result
 
-    plot(sizes, comparison_counts, swap_counts)
+g = Graph(5)
+g.add_edge(0, 1, 10)
+g.add_edge(1, 2, 20)
+g.add_edge(2, 3, 30)
+g.add_edge(3, 4, 40)
 
-if __name__ == '__main__':
-    main()
+print(g.graph)
+mst = g.mst()
+print(mst)

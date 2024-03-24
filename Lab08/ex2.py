@@ -34,3 +34,5 @@ class Graph:
                     distances[neighbor] = min_distance + weight
                     heapq.heappush(queue, (distances[neighbor], neighbor))
         return distances
+
+# 1. One possible way to implement this queue is linear search. Linear search is a slow way, and another possible way to implement this queue is to use 
