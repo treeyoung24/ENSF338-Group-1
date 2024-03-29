@@ -12,68 +12,54 @@ class Graph:
         return node
 
     def removeNode(self, node):
-        if node in self.adjacency_list:
-            del self.adjacency_list[node]
-            for adj_list in self.adjacency_list.values():
-                adj_list[:] = [n for n in adj_list if n != node]
+        del self.adjacency_list[node]
+        for adj_list in self.adjacency_list.values():
+            adj_list[:] = [n for n in adj_list if n[0] != node]
 
-    def addEdge(self, n1, n2, weight=1):
+    def addEdge(self, n1, n2, weight=None):
         if n1 in self.adjacency_list and n2 in self.adjacency_list:
             self.adjacency_list[n1].append((n2, weight))
             self.adjacency_list[n2].append((n1, weight))
+        else:
+            raise ValueError("One or both nodes not found in the graph.")
 
     def removeEdge(self, n1, n2):
         if n1 in self.adjacency_list and n2 in self.adjacency_list:
-            self.adjacency_list[n1] = [(node, weight) for node, weight in self.adjacency_list[n1] if node != n2]
-            self.adjacency_list[n2] = [(node, weight) for node, weight in self.adjacency_list[n2] if node != n1]
+            self.adjacency_list[n1] = [(n, w) for n, w in self.adjacency_list[n1] if n != n2]
+            self.adjacency_list[n2] = [(n, w) for n, w in self.adjacency_list[n2] if n != n1]
+        else:
+            raise ValueError("One or both nodes not found in the graph.")
 
     def importFromFile(self, file):
+        self.adjacency_list = {}
         try:
             with open(file, 'r') as f:
                 lines = f.readlines()
-                if not lines:
+                if len(lines) < 3 or not lines[0].startswith("strict graph"):
                     return None
-
-                # Check if the graph is undirected
-                if not lines[0].strip().startswith("strict graph"):
-                    return None
-
-                self.adjacency_list.clear()
-
-                for line in lines[1:]:
+                
+                for line in lines[2:]:
                     line = line.strip()
-                    if line and line[0] != '}':
-                        if line[-1] == ';':
-                            line = line[:-1]  # Remove trailing semicolon if present
-                        parts = line.split('--')
-                        if len(parts) != 2:
-                            return None
-                        node1 = parts[0].strip()
-                        node2_weight = parts[1].strip().split('[')
-                        node2 = node2_weight[0].strip()
-                        weight = 1
-                        if len(node2_weight) > 1:
-                            weight_part = node2_weight[1].strip()[:-1]  # Remove closing bracket
-                            weight_parts = weight_part.split('=')
-                            if len(weight_parts) != 2 or weight_parts[0].strip() != 'weight':
-                                return None
-                            try:
-                                weight = int(weight_parts[1].strip())
-                            except ValueError:
-                                return None
-
-                        n1 = self.addNode(node1)
-                        n2 = self.addNode(node2)
-                        self.addEdge(n1, n2, weight)
-
-                return self
-
+                    if line.endswith(";"):
+                        line = line[:-1]
+                    nodes = line.split("--")
+                    if len(nodes) != 2:
+                        return None
+                    node1 = nodes[0].strip()
+                    node2 = nodes[1].split("[")[0].strip()
+                    weight = 1
+                    if "weight" in line:
+                        weight = int(line.split("[")[1].split("=")[1].split("]")[0].strip())
+                    n1 = self.addNode(node1)
+                    n2 = self.addNode(node2)
+                    self.addEdge(n1, n2, weight)
         except FileNotFoundError:
             return None
 
-        return None
-
 # Example usage:
 graph = Graph()
-graph.importFromFile('example_graph.dot')
-print(graph.adjacency_list)
+result = graph.importFromFile("example_graph.txt")
+if result is not None:
+    print(graph.adjacency_list)
+else:
+    print("Error: Unable to import graph from file.")
