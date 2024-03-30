@@ -58,7 +58,7 @@ class Graph:
 
 # Example usage:
 graph = Graph()
-result = graph.importFromFile("example_graph.txt")
+result = graph.importFromFile("random.dot")
 if result is not None:
     print(graph.adjacency_list)
 else:
