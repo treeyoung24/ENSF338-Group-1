@@ -35,31 +35,40 @@ class Graph:
         try:
             with open(file, 'r') as f:
                 lines = f.readlines()
-                if len(lines) < 3 or not lines[0].startswith("strict graph"):
-                    return None
-                
-                for line in lines[2:]:
+                for line in lines:
                     line = line.strip()
+                    if line.startswith("strict graph"):
+                        continue  # Skip the graph type line
+                    if line.startswith("}"):
+                        break  # End of graph definition
                     if line.endswith(";"):
-                        line = line[:-1]
+                        line = line[:-1]  # Remove ending semicolon if present
                     nodes = line.split("--")
                     if len(nodes) != 2:
-                        return None
+                        return False  # Invalid edge format
                     node1 = nodes[0].strip()
-                    node2 = nodes[1].split("[")[0].strip()
+                    node2 = nodes[1].strip()
                     weight = 1
-                    if "weight" in line:
-                        weight = int(line.split("[")[1].split("=")[1].split("]")[0].strip())
+                    if "[" in node2:
+                        node2, attr = node2.split("[")
+                        attr = attr.strip("]").split("=")
+                        if len(attr) == 2 and attr[0].strip() == "weight":
+                            weight = int(attr[1])
                     n1 = self.addNode(node1)
                     n2 = self.addNode(node2)
                     self.addEdge(n1, n2, weight)
+            return True  # Successfully imported
         except FileNotFoundError:
-            return None
+            return False  # File not found
 
-# Example usage:
+# Create an instance of the Graph class
 graph = Graph()
+
+# Call importFromFile method with the path to the GraphViz file
 result = graph.importFromFile("random.dot")
-if result is not None:
-    print(graph.adjacency_list)
+
+# Check the result of the import operation
+if result:
+    print("Graph imported successfully.")
 else:
-    print("Error: Unable to import graph from file.")
+    print("Failed to import graph.")
