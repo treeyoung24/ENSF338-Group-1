@@ -3,9 +3,10 @@
 # use a priority queue where the priority of each node is determined by its distance from the source. To find the node with the smallest distance, the
 # priority queue would return the node with the smallest priority. This would have a time complexity of O(log(n)) for each operation.
 
-import random
-import sys
+import heapq
 import timeit
+
+import matplotlib.pyplot as plt
 
 
 class GraphNode:
@@ -45,102 +46,111 @@ class Graph:
         try:
             with open(file, 'r') as f:
                 lines = f.readlines()
-                if len(lines) < 3 or not lines[0].startswith("strict graph"):
-                    return None
-                
-                for line in lines[2:]:
+                for line in lines:
                     line = line.strip()
+                    if line.startswith("strict graph"):
+                        continue  # Skip the graph type line
+                    if line.startswith("}"):
+                        break  # End of graph definition
                     if line.endswith(";"):
-                        line = line[:-1]
+                        line = line[:-1]  # Remove ending semicolon if present
                     nodes = line.split("--")
                     if len(nodes) != 2:
-                        return None
+                        return False  # Invalid edge format
                     node1 = nodes[0].strip()
-                    node2 = nodes[1].split("[")[0].strip()
+                    node2 = nodes[1].strip()
                     weight = 1
-                    if "weight" in line:
-                        weight = int(line.split("[")[1].split("=")[1].split("]")[0].strip())
+                    if "[" in node2:
+                        node2, attr = node2.split("[")
+                        attr = attr.strip("]").split("=")
+                        if len(attr) == 2 and attr[0].strip() == "weight":
+                            weight = int(attr[1])
                     n1 = self.addNode(node1)
                     n2 = self.addNode(node2)
                     self.addEdge(n1, n2, weight)
+            return True  # Successfully imported
         except FileNotFoundError:
-            return None
-
-    def slowSP(self, source):
-        distances = {node: sys.maxsize for node in self.adjacency_list}
-        distances[source] = 0
-        unvisited = set(self.adjacency_list.keys())
-
-        while unvisited:
+            return False  # File not found
+        
+    # 2.
+    def slowSP(self, start_node):
+        distances = {node: float('inf') for node in self.adjacency_list}
+        distances[start_node] = 0
+        visited = set()
+        while len(visited) < len(self.adjacency_list):
             min_node = None
-            min_distance = sys.maxsize
-            for node in unvisited:
-                if distances[node] < min_distance:
-                    min_distance = distances[node]
+            min_distance = float('inf')
+            for node, distance in distances.items():
+                if node not in visited and distance < min_distance:
                     min_node = node
-
-            unvisited.remove(min_node)
-
+                    min_distance = distance
+            if min_node is None:
+                break
+            visited.add(min_node)
             for neighbor, weight in self.adjacency_list[min_node]:
-                if distances[min_node] + weight < distances[neighbor]:
-                    distances[neighbor] = distances[min_node] + weight
-
+                new_distance = distances[min_node] + weight
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
         return distances
 
-    def fastSP(self, source):
-        distances = {node: sys.maxsize for node in self.adjacency_list}
-        distances[source] = 0
-        unvisited = set(self.adjacency_list.keys())
-
-        while unvisited:
-            min_node = min(unvisited, key=lambda x: distances[x])
-            unvisited.remove(min_node)
-
-            for neighbor, weight in self.adjacency_list[min_node]:
-                if distances[min_node] + weight < distances[neighbor]:
-                    distances[neighbor] = distances[min_node] + weight
-
+    def fastSP(self, start_node):
+        distances = {node: float('inf') for node in self.adjacency_list}
+        distances[start_node] = 0
+        priority_queue = [(0, start_node)]
+        while priority_queue:
+            current_distance, current_node = heapq.heappop(priority_queue)
+            if current_distance > distances[current_node]:
+                continue
+            for neighbor, weight in self.adjacency_list[current_node]:
+                new_distance = current_distance + weight
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    heapq.heappush(priority_queue, (new_distance, neighbor))
         return distances
 
-# Function to measure time taken by an algorithm
-def measure_time(algorithm_func, graph):
-    return timeit.timeit(lambda: algorithm_func(random.choice(list(graph.adjacency_list.keys()))), number=1)
+# 3.
+def measure_performance(graph, algorithm_name):
+    setup_code = f"from __main__ import graph"
+    execution_code = f"graph.{algorithm_name}(list(graph.adjacency_list.keys())[0])"
+    time_taken = timeit.timeit(execution_code, setup=setup_code, number=1)
+    return time_taken
 
-# Define the number of iterations for averaging
-num_iterations = 10
+graph = Graph()
+graph.importFromFile("random.dot")
+
 slow_times = []
 fast_times = []
 
-graph = Graph()
-if graph.importFromFile("random.dot") is None:
-    print("Error: Failed to load the graph from file")
-else:
-    # Measure time for slowSP
-    for _ in range(num_iterations):
-        slow_time = measure_time(graph.slowSP, graph)
-        slow_times.append(slow_time)
+for _ in range(5):  # Run each algorithm multiple times for better accuracy
+    slow_time = measure_performance(graph, 'slowSP')
+    fast_time = measure_performance(graph, 'fastSP')
+    slow_times.append(slow_time)
+    fast_times.append(fast_time)
 
-    # Measure time for fastSP
-    for _ in range(num_iterations):
-        fast_time = measure_time(graph.fastSP, graph)
-        fast_times.append(fast_time)
+slow_avg_time = sum(slow_times) / len(slow_times)
+fast_avg_time = sum(fast_times) / len(fast_times)
 
-    # Calculate averages, max, and min
-    avg_slow_time = sum(slow_times) / num_iterations
-    max_slow_time = max(slow_times)
-    min_slow_time = min(slow_times)
+slow_min_time = min(slow_times)
+slow_max_time = max(slow_times)
 
-    avg_fast_time = sum(fast_times) / num_iterations
-    max_fast_time = max(fast_times)
-    min_fast_time = min(fast_times)
+fast_min_time = min(fast_times)
+fast_max_time = max(fast_times)
 
-    # Print results
-    print("Slow Version:")
-    print(f"Average time: {avg_slow_time}")
-    print(f"Max time: {max_slow_time}")
-    print(f"Min time: {min_slow_time}")
+print("Slow Algorithm:")
+print("Average time:", slow_avg_time)
+print("Min time:", slow_min_time)
+print("Max time:", slow_max_time)
 
-    print("\nFast Version:")
-    print(f"Average time: {avg_fast_time}")
-    print(f"Max time: {max_fast_time}")
-    print(f"Min time: {min_fast_time}")
+print("\nFast Algorithm:")
+print("Average time:", fast_avg_time)
+print("Min time:", fast_min_time)
+print("Max time:", fast_max_time)
+
+# 4.
+plt.hist(slow_times, bins=10, alpha=0.5, label='Slow Algorithm')
+plt.hist(fast_times, bins=10, alpha=0.5, label='Fast Algorithm')
+plt.legend(loc='upper right')
+plt.title('Distribution of Execution Times')
+plt.xlabel('Execution Time (seconds)')
+plt.ylabel('Frequency')
+plt.show()
