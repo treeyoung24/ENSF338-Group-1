@@ -41,69 +41,74 @@ class Graph:
                 lines = f.readlines()
                 if len(lines) < 3 or not lines[0].startswith("strict graph"):
                     return None
-                
+
                 for line in lines[2:]:
                     line = line.strip()
                     if line.endswith(";"):
                         line = line[:-1]
                     nodes = line.split("--")
-                    if len(nodes) != 2:
-                        return None
-                    node1 = nodes[0].strip()
-                    node2 = nodes[1].split("[")[0].strip()
-                    weight = 1
-                    if "weight" in line:
-                        weight = int(line.split("[")[1].split("=")[1].split("]")[0].strip())
-                    n1 = self.addNode(node1)
-                    n2 = self.addNode(node2)
-                    self.addEdge(n1, n2, weight)
+                    if len(nodes) == 2:  # Ensure there are two nodes
+                        node1, node2 = nodes[0], nodes[1]
+                        if node1 not in self.adjacency_list:
+                            self.adjacency_list[node1] = []
+                        if node2 not in self.adjacency_list:
+                            self.adjacency_list[node2] = []
+                        # Add edge between node1 and node2
+                        self.adjacency_list[node1].append((node2, 1))  # Assuming weight is 1
+                        self.adjacency_list[node2].append((node1, 1))  # Assuming weight is 1
         except FileNotFoundError:
+            print(f"File {file} not found.")
             return None
-    def is_cyclic_util(self, v, visited, rec_stack):
-        visited[v] = True
-        rec_stack[v] = True
 
-        for neighbor in self.graph[v]:
-            if not visited[neighbor]:
-                if self.is_cyclic_util(neighbor, visited, rec_stack):
+    def _has_cycle(self, node, visited, path):
+        visited.add(node)
+        path.add(node)
+
+        for neighbor in self.adjacency_list[node]:
+            if neighbor not in visited:
+                if self._has_cycle(neighbor, visited, path):
                     return True
-            elif rec_stack[neighbor]:
+            elif neighbor in path:
                 return True
 
-        rec_stack[v] = False
+        path.remove(node)
         return False
 
     def isdag(self):
-        visited = [False] * (self.V)
-        rec_stack = [False] * (self.V)
-        for node in range(self.V):
-            if not visited[node]:
-                if self.is_cyclic_util(node, visited, rec_stack):
+        visited = set()
+        path = set()
+
+        for node in self.adjacency_list:
+            if node not in visited:
+                if self._has_cycle(node, visited, path):
                     return False
         return True
-    def toposort_util(self, v, visited, stack):
-        visited[v] = True
-        for i in self.graph[v]:
-            if not visited[i]:
-                self.toposort_util(i, visited, stack)
-        stack.insert(0, v)
-
+    
     def toposort(self):
         if not self.isdag():
             return None
 
-        visited = [False]*self.V
+        visited = set()
         stack = []
 
-        for i in range(self.V):
-            if not visited[i]:
-                self.toposort_util(i, visited, stack)
+        for node in self.adjacency_list:
+            if node not in visited:
+                self._dfs(node, visited, stack)
 
-        return stack
+        return stack[::-1]
+    
+    def _dfs(self, node, visited, stack):
+        visited.add(node)
+
+        for neighbor in self.adjacency_list[node]:
+            if neighbor not in visited:
+                self._dfs(neighbor, visited, stack)
+
+        stack.append(node)
 
 # Example usage:
 graph = Graph()
-result = graph.importFromFile("random.dot")
+result = graph.importFromFile("D:\\Trevor School\\ENSF338\\ENSF338-Group-1\\Lab08\\random.dot")
 if result is not None:
     print(graph.adjacency_list)
 else:
