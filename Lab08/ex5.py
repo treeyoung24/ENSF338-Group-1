@@ -39,32 +39,37 @@ class Graph:
         try:
             with open(file, 'r') as f:
                 lines = f.readlines()
-                if len(lines) < 3 or not lines[0].startswith("strict graph"):
-                    return None
-
-                for line in lines[2:]:
+                for line in lines:
                     line = line.strip()
+                    if line.startswith("strict graph"):
+                        continue  # Skip the graph type line
+                    if line.startswith("}"):
+                        break  # End of graph definition
                     if line.endswith(";"):
-                        line = line[:-1]
+                        line = line[:-1]  # Remove ending semicolon if present
                     nodes = line.split("--")
-                    if len(nodes) == 2:  # Ensure there are two nodes
-                        node1, node2 = nodes[0], nodes[1]
-                        if node1 not in self.adjacency_list:
-                            self.adjacency_list[node1] = []
-                        if node2 not in self.adjacency_list:
-                            self.adjacency_list[node2] = []
-                        # Add edge between node1 and node2
-                        self.adjacency_list[node1].append((node2, 1))  # Assuming weight is 1
-                        self.adjacency_list[node2].append((node1, 1))  # Assuming weight is 1
+                    if len(nodes) != 2:
+                        return False  # Invalid edge format
+                    node1 = nodes[0].strip()
+                    node2 = nodes[1].strip()
+                    weight = 1
+                    if "[" in node2:
+                        node2, attr = node2.split("[")
+                        attr = attr.strip("]").split("=")
+                        if len(attr) == 2 and attr[0].strip() == "weight":
+                            weight = int(attr[1])
+                    n1 = self.addNode(node1)
+                    n2 = self.addNode(node2)
+                    self.addEdge(n1, n2, weight)
+            return True  # Successfully imported
         except FileNotFoundError:
-            print(f"File {file} not found.")
-            return None
+            return False  # File not found
 
     def _has_cycle(self, node, visited, path):
         visited.add(node)
         path.add(node)
 
-        for neighbor in self.adjacency_list[node]:
+        for neighbor, _ in self.adjacency_list[node]:  # Use the GraphNode object itself as the key
             if neighbor not in visited:
                 if self._has_cycle(neighbor, visited, path):
                     return True
@@ -100,17 +105,17 @@ class Graph:
     def _dfs(self, node, visited, stack):
         visited.add(node)
 
-        for neighbor in self.adjacency_list[node]:
+        for neighbor, _ in self.adjacency_list[node]:
             if neighbor not in visited:
                 self._dfs(neighbor, visited, stack)
 
         stack.append(node)
-
+        
 # Example usage:
 graph = Graph()
-result = graph.importFromFile("D:\\Trevor School\\ENSF338\\ENSF338-Group-1\\Lab08\\random.dot")
-if result is not None:
-    print(graph.adjacency_list)
-else:
-    print("Error: Unable to import graph from file.")
+graph.importFromFile("D:\\Trevor School\\ENSF338\\ENSF338-Group-1\\Lab08\\random.dot")
 
+if graph.isdag():
+    print(graph.toposort())
+else:
+    print("The graph is not a DAG and cannot be sorted topologically.")
