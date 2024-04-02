@@ -116,7 +116,7 @@ def measure_performance(graph, algorithm_name):
     return time_taken
 
 graph = Graph()
-graph.importFromFile("random.dot")
+graph.importFromFile("C:\\ensf338\\ENSF338-Group-1\\Lab08\\random.dot")
 
 slow_times = []
 fast_times = []
@@ -154,3 +154,7 @@ plt.title('Distribution of Execution Times')
 plt.xlabel('Execution Time (seconds)')
 plt.ylabel('Frequency')
 plt.show()
+
+# As expected, the histogram shows that the fast algorithm frequently has lower execution times than the slow algorithm. The fast algorithm uses a priority 
+# queue to efficiently find the node with the smallest distance, resulting in a faster overall execution time compared to the slow algorithm, which uses linear
+# search to find the node with the smallest distance. 
