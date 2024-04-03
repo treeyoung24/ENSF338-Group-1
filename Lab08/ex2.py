@@ -116,7 +116,7 @@ def measure_performance(graph, algorithm_name):
     return time_taken
 
 graph = Graph()
-graph.importFromFile("C:\\ensf338\\ENSF338-Group-1\\Lab08\\random.dot")
+graph.importFromFile("random.dot") # Change the file path as needed
 
 slow_times = []
 fast_times = []

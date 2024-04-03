@@ -1,6 +1,5 @@
 import time
 
-
 class GraphNode:
     def __init__(self, data):
         self.data = data
@@ -64,87 +63,81 @@ class Graph:
         except FileNotFoundError:
             return False  # File not found
 
-    def dfs(self):
-        visited = set()
-        result = []
-
-        # Use the first node in the adjacency list as the starting node for DFS
-        start_node = next(iter(self.adjacency_list.keys()))
-
-        def dfs_util(node):
-            visited.add(node)
-            result.append(node.data)
-            for neighbor, _ in self.adjacency_list[node]:
-                if neighbor not in visited:
-                    dfs_util(neighbor)
-
-        dfs_util(start_node)
-        return result
+    def dfs(self, start_node, visited=None):
+        if visited is None:
+            visited = set()
+        visited.add(start_node)
+        dfs_result = [start_node]
+        for neighbor, _ in self.adjacency_list.get(start_node, []):
+            if neighbor not in visited:
+                dfs_result.extend(self.dfs(neighbor, visited))
+        return dfs_result
 
 class Graph2(Graph):
     def __init__(self):
         super().__init__()
         self.adjacency_matrix = {}
 
+    def addNode(self, data):
+        node = GraphNode(data)
+        self.adjacency_list[node] = []
+        self.adjacency_matrix[node] = {}
+        return node
+
     def addEdge(self, n1, n2, weight=None):
         super().addEdge(n1, n2, weight)
-        if n1.data not in self.adjacency_matrix:
-            self.adjacency_matrix[n1.data] = {}
-        if n2.data not in self.adjacency_matrix:
-            self.adjacency_matrix[n2.data] = {}
-        self.adjacency_matrix[n1.data][n2.data] = weight
-        self.adjacency_matrix[n2.data][n1.data] = weight
+        self.adjacency_matrix[n1][n2] = weight
+        self.adjacency_matrix[n2][n1] = weight
 
-    def dfs(self):
-        visited = set()
-        result = []
+    def removeEdge(self, n1, n2):
+        super().removeEdge(n1, n2)
+        del self.adjacency_matrix[n1][n2]
+        del self.adjacency_matrix[n2][n1]
 
-        # Use the first node in the adjacency list as the starting node for DFS
-        start_node = next(iter(self.adjacency_matrix.keys()))
+    def dfs(self, start_node, visited=None):
+        if visited is None:
+            visited = set()
+        visited.add(start_node)
+        dfs_result = [start_node]
+        for neighbor, _ in self.adjacency_list.get(start_node, []):
+            if neighbor not in visited:
+                dfs_result.extend(self.dfs(neighbor, visited))
+        return dfs_result
 
-        def dfs_util(node):
-            visited.add(node)
-            result.append(node)
-            for neighbor in self.adjacency_matrix[node]:
-                if neighbor not in visited:
-                    dfs_util(neighbor)
-
-        dfs_util(start_node)
-        return result
-
-# Define a function to measure the performance of dfs() for a given graph instance
-def measure_dfs_performance(graph_instance, iterations=10):
+# Measure performance
+def measure_performance(graph, num_iterations=10):
     times = []
-    for _ in range(iterations):
+    for _ in range(num_iterations):
         start_time = time.time()
-        graph_instance.dfs()
+        graph.dfs(list(graph.adjacency_list.keys())[0])
         end_time = time.time()
-        execution_time = end_time - start_time
-        times.append(execution_time)
+        times.append(end_time - start_time)
     return times
 
-# Create instances of Graph and Graph2 classes
+# Example usage:
 graph = Graph()
+graph.importFromFile("random.dot")
+
 graph2 = Graph2()
+graph2.importFromFile("random.dot")
 
-# Import the graph from the file
-result_graph = graph.importFromFile("C:\\ensf338\\ENSF338-Group-1\\Lab08\\random.dot")
-result_graph2 = graph2.importFromFile("C:\\ensf338\\ENSF338-Group-1\\Lab08\\random.dot")
+times_graph = measure_performance(graph)
+times_graph2 = measure_performance(graph2)
 
-if result_graph and result_graph2:
-    print("Graphs imported successfully.")
-    # Measure performance of dfs() for Graph class
-    graph_dfs_times = measure_dfs_performance(graph)
-    print("Graph DFS performance:")
-    print("Max time:", max(graph_dfs_times))
-    print("Min time:", min(graph_dfs_times))
-    print("Average time:", sum(graph_dfs_times) / len(graph_dfs_times))
+print("Graph:")
+print("Max time:", max(times_graph))
+print("Min time:", min(times_graph))
+print("Average time:", sum(times_graph) / len(times_graph))
 
-    # Measure performance of dfs() for Graph2 class
-    graph2_dfs_times = measure_dfs_performance(graph2)
-    print("\nGraph2 DFS performance:")
-    print("Max time:", max(graph2_dfs_times))
-    print("Min time:", min(graph2_dfs_times))
-    print("Average time:", sum(graph2_dfs_times) / len(graph2_dfs_times))
-else:
-    print("Failed to import graphs.")
+print("\nGraph2:")
+print("Max time:", max(times_graph2))
+print("Min time:", min(times_graph2))
+print("Average time:", sum(times_graph2) / len(times_graph2))
+
+
+# Question 3
+"""
+Overall, the performance of  Graph2 is generally better than the Graph class. This is because the adjacency matrix allows for faster lookups of edges between nodes compared to the adjacency list. 
+The adjacency matrix provides constant time complexity for edge lookups, while the adjacency list requires iterating through the list of neighbors for each node, 
+resulting in a higher time complexity. This difference in performance is more pronounced in larger graphs with many edges, where the adjacency matrix can provide significant speed improvements.
+"""
