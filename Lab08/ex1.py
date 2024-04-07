@@ -65,7 +65,7 @@ class Graph:
 graph = Graph()
 
 # Call importFromFile method with the path to the GraphViz file
-result = graph.importFromFile("random.dot")
+result = graph.importFromFile("random.dot") # Change the file path as needed
 
 # Check the result of the import operation
 if result:
