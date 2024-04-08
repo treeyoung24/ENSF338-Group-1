@@ -1,5 +1,5 @@
 class DLeftHashTable:
-    def __init__(self, entries, buckets):
+    def DLeftHashTable(self, entries, buckets):
         self.entries = entries
         self.buckets = buckets
         self.table = [[] for _ in range(entries * buckets)]
@@ -21,15 +21,3 @@ class DLeftHashTable:
             if item[0] == key:
                 return item[1]
         return None
-
-
-# Example usage:
-hash_table = DLeftHashTable(entries=5, buckets=3)
-hash_table.insert("apple", 10)
-hash_table.insert("banana", 20)
-hash_table.insert("orange", 30)
-
-print(hash_table.lookup("apple"))  # Output: 10
-print(hash_table.lookup("banana"))  # Output: 20
-print(hash_table.lookup("orange"))  # Output: 30
-print(hash_table.lookup("grape"))  # Output: None
